@@ -1,0 +1,114 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <title>ToDO list manager</title>
+    <style>
+        .list-group-item {
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .list-group-item.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .list-group-item-action:not(.active):hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-3">
+        <h1 class="text-center">TO DO List Manager </h1>
+
+        <div class="row mt-4">
+            <div class="col-md-2">
+                <div class="list-group"></div>
+                <a th:href="@{/}" class="list-group-item list-group-item-action"
+                    style="background-color: #28a745; color: white;">Menu</a>
+                <a th:href="@{/add}" th:classappend="${page == 'addToDo'} ? ' active'"
+                    class="list-group-item list-group-item-action"
+                    style="transition: background-color 0.3s, color 0.3s;">Add To Do</a>
+                <a th:href="@{/view}" th:classappend="${page == 'view'} ? ' active'"
+                    class="list-group-item list-group-item-action"
+                    style="transition: background-color 0.3s, color 0.3s;">View To DO</a>
+            </div>
+
+            <div class="col-md-10">
+                <div th:if="${page=='addToDo'}">
+                    <h3 class="text-center">Add TO Do's</h3>
+                    <div>
+                        <form th:action="@{/save}" th:method="post" th:object="${toDoForm}">
+
+                            <input th:field="*{toDoTitle}" type="text" placeholder="Enter title for Task"
+                                class="form-control w-100">
+
+                            <textarea th:field="*{toDoContent}" type="text" placeholder="Enter the task description"
+                                class="form-control w-100 mt-2" rows="8"></textarea>
+
+
+                            <br>
+                            <div class="text-center">
+                                <button class="saveButton" type="submit">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div th:if="${page=='view'}">
+                    <h3 class="text-center">All TO Do's</h3>
+                    <div th:each="todo : ${todos}">
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h2 th:text="${todo.getToDoTitle()}"></h2>
+                                <p th:text="${todo.getToDoContent()}"></p>
+
+                                <form class="delete-form" th:action="@{/delete/{id}(id=${todo.getId()})}" method="post">
+                                    <button type="submit" class="btn btn-danger delete-btn">Delete</button>
+                                </form>
+
+                                <form th:action="@{/edit/{id}(id=${todo.getId()})}" method="get" >
+                                    <button type="submit" class="btn btn-primary">Edit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${page=='edit'}">
+                    <h3 class="text-center">Edit TO Do's</h3>
+                    <div>
+                        <form th:action="@{/update}" th:method="post" th:object="${toDoForm}">
+                            <input type="hidden" th:field="*{id}">
+                            <input th:field="*{toDoTitle}" type="text" placeholder="Edit title for Task"
+                                class="form-control w-100" th:value="${toDoForm.getToDoTitle()}">
+
+                            <textarea th:field="*{toDoContent}" type="text" placeholder="Edit the task description"
+                                class="form-control w-100 mt-2" rows="8" th:value="${toDoForm.getToDoContent()}"></textarea>
+                            <br>
+                            <div class="text-center">
+                                <button class="saveButton" type="submit">Save</button>
+                            </div>
+                        </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>
